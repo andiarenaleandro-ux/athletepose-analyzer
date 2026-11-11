@@ -4,7 +4,7 @@
 
 Combina pose estimation moderna (MoveNet de Google) con clasificación de contenido (MobileNetV2 preentrenada en ImageNet) para producir un análisis postural interpretado según el deporte detectado.
 
-> Proyecto del 2° Parcial de la materia **Procesamiento de Imágenes** · Licenciatura en Ciencia de Datos e IA · ISSD · 2026.
+> Proyecto **Procesamiento de Imágenes** · Ciencia de Datos e IA · ISSD · 2026.
 
 ![Demo principal](imagenes/screenshots/screenshot_01_weightlifting.png)
 
