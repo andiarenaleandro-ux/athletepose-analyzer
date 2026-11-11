@@ -1,10 +1,6 @@
 import cv2
 import numpy as np
-from tensorflow.keras.applications.mobilenet_v2 import (
-    MobileNetV2,
-    preprocess_input,
-    decode_predictions,
-)
+from tensorflow.keras.applications.mobilenet_v2 import (MobileNetV2,preprocess_input,decode_predictions,)
 
 
 def load_classifier():
@@ -40,27 +36,22 @@ def classify_image(
                      Ejemplo: [('n03980874', 'poncho', 0.82),
                                ('n04254777', 'sock', 0.07), ...]
     """
-    # 1. Resize a 224x224 (input obligatorio de MobileNetV2).
-    #    cv2.resize usa interpolación bilineal por default (suficiente para CNN).
+    #  Resize a 224x224 (input obligatorio de MobileNetV2).
     resized = cv2.resize(image_rgb, (224, 224))
 
-    # 2. Convertir a float32 (requerido por TensorFlow para operaciones numéricas).
+    # 2Convertir a float32 (requerido por TensorFlow para operaciones numéricas).
     resized = resized.astype(np.float32)
 
-    # 3. Agregar dimensión de batch: (224,224,3) → (1,224,224,3).
-    #    TF siempre espera un batch, aunque tengamos una sola imagen.
+    # TF siempre espera un batch, aunque tengamos una sola imagen.
     batch = np.expand_dims(resized, axis=0)
 
-    # 4. Preprocesamiento específico de MobileNetV2:
-    #    escala [0, 255] → [-1, 1] (la red fue entrenada con ese rango).
+    # 4Preprocesamiento específico de MobileNetV2: escala [0, 255] → [-1, 1] (la red fue entrenada con ese rango).
     batch = preprocess_input(batch)
 
-    # 5. Inferencia. verbose=0 silencia los logs de progreso de TF.
+    # Inferencia. verbose=0 silencia los logs de progreso de TF.
     predictions = model.predict(batch, verbose=0)
 
-    # 6. Decodificar: convertir vector de 1000 probabilidades en top-K predicciones
-    #    con labels legibles. decode_predictions devuelve una lista por imagen del batch;
-    #    como pasamos 1 imagen, tomamos [0].
+    # Decodificar: convertir vector de 1000 probabilidades en top-K predicciones
     decoded = decode_predictions(predictions, top=top_k)[0]
 
     return decoded

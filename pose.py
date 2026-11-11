@@ -3,7 +3,7 @@ import tensorflow as tf
 import tensorflow_hub as hub
 import cv2
 
-# ──────────────────────────────────────────────
+
 # Constantes del modelo MoveNet SinglePose Lightning
 # ──────────────────────────────────────────────
 MOVENET_URL = "https://tfhub.dev/google/movenet/singlepose/lightning/4"
@@ -75,7 +75,7 @@ def detect_pose(
     """
     H, W = image_rgb.shape[:2]
 
-    # 1. Preparar input: resize a INPUT_SIZE x INPUT_SIZE con padding
+    #  Preparar input: resize a INPUT_SIZE x INPUT_SIZE con padding
     #    para mantener aspect ratio, agregar dimensión de batch, int32.
     input_image = tf.image.resize_with_pad(
         tf.expand_dims(image_rgb, axis=0),
@@ -83,30 +83,30 @@ def detect_pose(
     )
     input_image = tf.cast(input_image, dtype=tf.int32)
 
-    # 2. Inferencia. outputs['output_0'] tiene shape (1, 1, 17, 3).
+    # Inferencia. outputs['output_0'] tiene shape (1, 1, 17, 3).
     outputs = model(input_image)
     keypoints_raw = outputs['output_0'].numpy()[0, 0, :, :]  # shape (17, 3)
 
-    # 3. Calcular parámetros del padding usado por resize_with_pad.
-    #    Necesario para denormalizar correctamente las coordenadas.
+    # Calcular parámetros del padding usado por resize_with_pad.
+    # Necesario para denormalizar correctamente las coordenadas.
     scale = min(INPUT_SIZE / H, INPUT_SIZE / W)
     scaled_H = H * scale
     scaled_W = W * scale
     pad_y = (INPUT_SIZE - scaled_H) / 2
     pad_x = (INPUT_SIZE - scaled_W) / 2
 
-    # 4. Convertir cada keypoint a coordenadas de píxel de la imagen original.
+    # Convertir cada keypoint a coordenadas de píxel de la imagen original.
     keypoints = []
     for i, (y_norm, x_norm, confidence) in enumerate(keypoints_raw):
-        # a. Pasar de normalizado [0,1] a píxel en espacio PADDED.
+        # Pasar de normalizado [0,1] a píxel en espacio PADDED.
         y_padded = y_norm * INPUT_SIZE
         x_padded = x_norm * INPUT_SIZE
 
-        # b. Remover el padding para obtener píxel en espacio ESCALADO.
+        # Remover el padding para obtener píxel en espacio ESCALADO.
         y_scaled = y_padded - pad_y
         x_scaled = x_padded - pad_x
 
-        # c. Re-escalar a tamaño original.
+        # Re-escalar a tamaño original.
         y_px = int(y_scaled / scale)
         x_px = int(x_scaled / scale)
 
@@ -147,7 +147,7 @@ def draw_skeleton(
     """
     output = image_rgb.copy()
 
-    # 1. Dibujar líneas entre pares de keypoints (según SKELETON_EDGES).
+    # Dibujar líneas entre pares de keypoints (según SKELETON_EDGES).
     for (idx_a, idx_b) in SKELETON_EDGES:
         kp_a = keypoints[idx_a]
         kp_b = keypoints[idx_b]
@@ -160,7 +160,7 @@ def draw_skeleton(
                 line_thickness,
             )
 
-    # 2. Dibujar círculos en cada keypoint detectado.
+    # Dibujar círculos en cada keypoint detectado.
     for kp in keypoints:
         if kp["detected"]:
             cv2.circle(

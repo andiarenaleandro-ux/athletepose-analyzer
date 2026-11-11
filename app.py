@@ -4,31 +4,22 @@ import pandas as pd
 from utils import load_image
 from pose import load_pose_model, detect_pose, draw_skeleton
 from classification import load_classifier, classify_image
-from metrics import (
-    calculate_joint_angles,
-    classify_sport_category,
-    interpret_angles,
-)
+from metrics import (calculate_joint_angles, classify_sport_category,interpret_angles,)
 
 
-# ──────────────────────────────────────────────
+
 # Modelos cacheados
-# ──────────────────────────────────────────────
 @st.cache_resource
 def get_pose_model():
     """Carga MoveNet una sola vez y lo mantiene en memoria entre interacciones."""
     return load_pose_model()
-
 
 @st.cache_resource
 def get_classifier():
     """Carga MobileNetV2 una sola vez."""
     return load_classifier()
 
-
-# ──────────────────────────────────────────────
 # Pipeline principal
-# ──────────────────────────────────────────────
 def tab_pipeline():
     st.header("Pose Analyzer — Detección articular")
     st.markdown(
@@ -51,9 +42,9 @@ def tab_pipeline():
     if image is None:
         return
 
-    # ──────────────────────────────────────────
+
     # 1. Detección de pose (MoveNet)
-    # ──────────────────────────────────────────
+
     st.divider()
     st.subheader("1. Detección de keypoints (MoveNet)")
 
@@ -107,7 +98,7 @@ def tab_pipeline():
         df["detected"] = df["detected"].map(lambda v: "✅" if v else "❌")
         st.dataframe(df, use_container_width=True, hide_index=True)
 
-    # ──────────────────────────────────────────
+
     # 2. Cálculo de ángulos articulares
     # ──────────────────────────────────────────
     st.divider()
@@ -167,7 +158,7 @@ def tab_pipeline():
         df = pd.DataFrame(rows)
         st.dataframe(df, use_container_width=True, hide_index=True)
 
-    # ──────────────────────────────────────────
+
     # 3. Clasificación del deporte (MobileNetV2)
     # ──────────────────────────────────────────
     st.divider()
@@ -195,7 +186,7 @@ def tab_pipeline():
     category, trigger = classify_sport_category(predictions)
     if trigger:
         st.success(
-            f"🎯 Categoría deportiva inferida: **{category}** "
+            f"Categoría deportiva inferida: **{category}** "
             f"(disparada por '{trigger}')"
         )
     else:
@@ -204,7 +195,7 @@ def tab_pipeline():
             "(ninguna clase de ImageNet matcheó con un deporte conocido)."
         )
 
-    # ──────────────────────────────────────────
+
     # 4. Interpretación automática según deporte
     # ──────────────────────────────────────────
     st.divider()
@@ -236,12 +227,11 @@ def tab_pipeline():
                 st.error(f"❌ **{joint_label}: {angle_str}** — {item['message']}")
 
 
-# ──────────────────────────────────────────────
 # Main
 # ──────────────────────────────────────────────
 def main():
     st.set_page_config(
-        page_title="AthletePose Analyzer — Parcial 2 PI",
+        page_title="AthletePose Analyzer",
         layout="wide",
     )
     st.title("AthletePose Analyzer")
