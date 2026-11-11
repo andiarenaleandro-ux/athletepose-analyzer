@@ -1,0 +1,66 @@
+# ──────────────────────────────────────
+# Virtual environments
+# ──────────────────────────────────────
+venv/
+.venv/
+env/
+ENV/
+
+# ──────────────────────────────────────
+# Python
+# ──────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+*.egg
+
+# ──────────────────────────────────────
+# Jupyter (por si abrís algún notebook de exploración)
+# ──────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ──────────────────────────────────────
+# Variables de entorno y secretos
+# ──────────────────────────────────────
+.env
+.env.local
+.streamlit/secrets.toml
+
+# ──────────────────────────────────────
+# Editores e IDEs
+# ──────────────────────────────────────
+.vscode/
+.idea/
+*.sublime-*
+*.swp
+*.swo
+
+# ──────────────────────────────────────
+# Sistemas operativos
+# ──────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ──────────────────────────────────────
+# Logs y temporales
+# ──────────────────────────────────────
+*.log
+*.tmp
+*.cache
+
+# ──────────────────────────────────────
+# Caches de modelos descargados localmente
+# (TensorFlow/Keras guarda modelos en ~/.keras, no acá;
+# pero por si acaso lo descargás al proyecto)
+# ──────────────────────────────────────
+models/
+*.h5
+*.pb
+*.ckpt
