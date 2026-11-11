@@ -87,15 +87,16 @@ La app se abre automáticamente en `http://localhost:8501`.
 ## Estructura del proyecto
 
 athletepose-analyzer/
-├── app.py # UI Streamlit y orquestación
-├── pose.py # MoveNet + dibujo del esqueleto
-├── classification.py # MobileNetV2
-├── metrics.py # Ángulos + mapeo a categoría + interpretación
-├── utils.py # Helpers (load_image)
-├── requirements.txt # Dependencias pineadas
-├── explicacion.md # Documento técnico completo
-├── README.md # Este archivo
-└── imagenes/ # Fotos de ejemplo y screenshots
+
+   ├── app.py # UI Streamlit y orquestación
+   ├── pose.py # MoveNet + dibujo del esqueleto
+   ├── classification.py # MobileNetV2
+   ├── metrics.py # Ángulos + mapeo a categoría + interpretación
+   ├── utils.py # Helpers (load_image)
+   ├── requirements.txt # Dependencias pineadas
+   ├── explicacion.md # Documento técnico completo
+   ├── README.md # Este archivo
+   └── imagenes/ # Fotos de ejemplo y screenshots
 
 
 Diseño **modular**: módulos de procesamiento no dependen de Streamlit. Separación estricta de responsabilidades.
