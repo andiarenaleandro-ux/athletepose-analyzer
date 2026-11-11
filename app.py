@@ -1,17 +1,18 @@
 import cv2
+import numpy as np
 import streamlit as st
 
 from utils import load_image
 from detection import detect_faces
 from classification import load_classifier, classify_image
+from segmentation import segment_kmeans, build_mask_from_clusters
 
 
 # ──────────────────────────────────────────────
-# Modelos cacheados (se cargan una sola vez)
+# Modelos cacheados
 # ──────────────────────────────────────────────
 @st.cache_resource
 def get_classifier():
-    """Carga MobileNetV2 una sola vez y lo cachea en memoria."""
     return load_classifier()
 
 
@@ -122,7 +123,6 @@ def tab_pipeline():
         classifier = get_classifier()
         predictions = classify_image(image, classifier, top_k=top_k)
 
-    # Mostrar predicciones como métricas en columnas.
     cols = st.columns(top_k)
     for i, (imagenet_id, label, confidence) in enumerate(predictions):
         with cols[i]:
@@ -133,7 +133,6 @@ def tab_pipeline():
                 delta_color="off",
             )
 
-    # Nota interpretativa.
     top_label = predictions[0][1].replace("_", " ")
     top_conf = predictions[0][2] * 100
     if top_conf > 50:
@@ -148,11 +147,71 @@ def tab_pipeline():
     st.divider()
 
     # ──────────────────────────────────────────
-    # PASOS 3 a 6 — Pendientes (próximos hitos)
+    # PASO 3 — Segmentación del atleta (K-means)
+    # ──────────────────────────────────────────
+    st.subheader("3. Segmentación del atleta (K-means)")
+    st.markdown(
+        "Agrupa los píxeles en K clusters por similitud de color. El usuario "
+        "selecciona qué clusters representan al atleta para construir la máscara "
+        "binaria."
+    )
+
+    k = st.slider(
+        "Número de clusters (K)", min_value=2, max_value=6, value=3,
+        help="Más clusters = más detalle pero más fragmentación.",
+    )
+
+    with st.spinner(f"Ejecutando K-means con K={k}..."):
+        segmented, labels, centers = segment_kmeans(image, k=k)
+
+    # Vista comparativa: original vs segmentada
+    col_orig, col_seg = st.columns(2)
+    with col_orig:
+        st.image(image, caption="Original", use_container_width=True)
+    with col_seg:
+        st.image(segmented, caption=f"Segmentada (K={k})", use_container_width=True)
+
+    # Swatches de cada cluster + checkboxes para seleccionar
+    st.markdown("**Seleccioná los clusters que representan al atleta:**")
+    cluster_cols = st.columns(k)
+    selected_clusters = []
+    for i in range(k):
+        with cluster_cols[i]:
+            # Mostrar el color del cluster como swatch cuadrado.
+            swatch = np.full((100, 100, 3), centers[i], dtype=np.uint8)
+            st.image(swatch, caption=f"Cluster {i}")
+            # Contar píxeles del cluster para dar info al usuario.
+            pixel_count = int(np.sum(labels == i))
+            pct = pixel_count / labels.size * 100
+            st.caption(f"{pct:.1f}% de la imagen")
+            # Checkbox para incluir en máscara.
+            if st.checkbox(f"Incluir", key=f"cluster_{i}"):
+                selected_clusters.append(i)
+
+    if selected_clusters:
+        mask = build_mask_from_clusters(labels, selected_clusters)
+        atleta_aislado = cv2.bitwise_and(image, image, mask=mask)
+
+        col_mask, col_atleta = st.columns(2)
+        with col_mask:
+            st.image(mask, caption="Máscara binaria", use_container_width=True)
+        with col_atleta:
+            st.image(
+                atleta_aislado,
+                caption="Atleta aislado (máscara aplicada)",
+                use_container_width=True,
+            )
+    else:
+        st.info("☝️ Marcá al menos un cluster para generar la máscara del atleta.")
+
+    st.divider()
+
+    # ──────────────────────────────────────────
+    # PASOS 4 a 6 — Pendientes
     # ──────────────────────────────────────────
     st.warning(
-        "Pipeline en construcción. Próximos módulos: segmentación del atleta, "
-        "limpieza morfológica, detección de puntos característicos, métricas geométricas."
+        "Pipeline en construcción. Próximos módulos: limpieza morfológica, "
+        "detección de puntos característicos, métricas geométricas."
     )
 
 
